@@ -12,7 +12,7 @@ package com.ifelseco.issueapp;
 public class IssueappApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(UserApiApplication.class, args);
+        SpringApplication.run(IssueappApplication.class, args);
     }
 
 
