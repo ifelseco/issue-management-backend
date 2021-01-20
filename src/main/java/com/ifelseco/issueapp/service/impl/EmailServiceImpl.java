@@ -36,7 +36,7 @@ public class EmailServiceImpl implements EmailService {
 
             Context context = new Context();
             context.setVariables(mail.getModel());
-            String html = templateEngine.process("email/confirm-email", context);
+            String html = templateEngine.process("templates/email/confirm-email", context);
 
             helper.setTo(mail.getTo());
             helper.setText(html, true);
@@ -47,7 +47,6 @@ public class EmailServiceImpl implements EmailService {
         } catch (Exception e){
             LOG.error("Email send error: {} "+e.getClass()+e.getMessage());
             throw new RuntimeException(e);
-
 
         }
 

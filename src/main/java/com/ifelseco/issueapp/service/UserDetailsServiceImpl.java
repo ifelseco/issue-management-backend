@@ -10,16 +10,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service
-public class UserSecurityService implements UserDetailsService {
+@Service("userSecurityService")
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UserRepository userRepository;
 
-    private static final Logger LOG= LoggerFactory.getLogger(UserSecurityService.class);
+    private static final Logger LOG= LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
 
     @Autowired
-    public UserSecurityService(UserRepository userRepository) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
