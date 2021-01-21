@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/js/**",
             "/image/**",
             "/register",
+            "/login",
             "/user/confirm-email"
     };
 
@@ -43,11 +44,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable().cors().disable().httpBasic().and().authorizeRequests()
-                .antMatchers(PUBLIC_MATCHES).permitAll().anyRequest().authenticated()
+                .antMatchers(PUBLIC_MATCHES).permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().formLogin().disable();
 
     }
 
@@ -62,5 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
     }
+
+
 
 }
