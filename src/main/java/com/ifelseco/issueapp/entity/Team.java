@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -30,9 +31,14 @@ public class Team implements Serializable {
     @Column(nullable = false, columnDefinition = "varchar(50)")
     private String name;
 
-    @CreatedDate
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime createTime;
+//    @CreatedDate
+//    @Column(columnDefinition = "TIMESTAMP")
+    private Date createTime;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createTime = new Date();
+    }
 
     //it is id of leader
     private Long createdBy;
