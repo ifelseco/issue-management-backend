@@ -4,10 +4,10 @@ import com.ifelseco.issueapp.config.SecurityUtility;
 import com.ifelseco.issueapp.entity.Role;
 import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.entity.UserRole;
+import com.ifelseco.issueapp.mapping.impl.FromRegisterModelToUser;
 import com.ifelseco.issueapp.model.ErrorModel;
 import com.ifelseco.issueapp.model.RegisterModel;
 import com.ifelseco.issueapp.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,17 +27,17 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/register")
 public class RegisterController {
 
-    private UserService userService;
+    private final UserService userService;
+    private final FromRegisterModelToUser fromRegisterModelToUser;
 
     @Autowired
-    public RegisterController(UserService userService) {
+    public RegisterController(UserService userService, FromRegisterModelToUser fromRegisterModelToUser) {
         this.userService = userService;
+        this.fromRegisterModelToUser = fromRegisterModelToUser;
     }
 
     @PostMapping
     public ResponseEntity register(@Valid @RequestBody RegisterModel registerModel, Errors errors) {
-
-        ModelMapper modelMapper = new ModelMapper();
 
         if(errors.hasErrors()) {
             return new ResponseEntity(convertValidationErrors(errors),HttpStatus.BAD_REQUEST);
@@ -49,7 +49,7 @@ public class RegisterController {
                 return new ResponseEntity("Username has already registered", HttpStatus.BAD_REQUEST);
             } else {
 
-                User savingUser = modelMapper.map(registerModel, User.class);
+                User savingUser = fromRegisterModelToUser.convert(registerModel);
                 savingUser.setPassword(SecurityUtility.passwordEncoder().encode(savingUser.getPassword()));
 
                 Role role = new Role();

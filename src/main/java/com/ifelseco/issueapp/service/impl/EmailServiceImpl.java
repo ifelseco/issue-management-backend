@@ -51,4 +51,31 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
+
+    @Override
+    public void sendInvitationEmail(EmailModel mail) {
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+
+            Context context = new Context();
+            context.setVariables(mail.getModel());
+            String html = templateEngine.process("/confirm-invitation-email", context);
+
+            helper.setTo(mail.getTo());
+            helper.setText(html, true);
+            helper.setSubject(mail.getSubject());
+            helper.setFrom(mail.getFrom());
+
+            emailSender.send(message);
+        } catch (Exception e){
+            LOG.error("Email send error: {} "+e.getClass()+e.getMessage());
+            throw new RuntimeException(e);
+
+        }
+
+    }
 }
