@@ -33,6 +33,7 @@ public class User implements UserDetails , Serializable {
     private boolean enabled;
     private boolean accountNonLocked=true;
 
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude private Set<UserRole> userRoles=new HashSet<>();
 
