@@ -77,8 +77,6 @@ public class UserServiceImpl implements UserService {
 
     private void sendConfirmEmail(User savedUser, EmailService emailService) {
 
-        // create confirm token
-        // send it to user via link
 
         ConfirmUserToken confirmUserToken=new ConfirmUserToken();
         confirmUserToken.setToken(UUID.randomUUID().toString());

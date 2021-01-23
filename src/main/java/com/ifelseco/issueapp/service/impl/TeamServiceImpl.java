@@ -6,6 +6,7 @@ import com.ifelseco.issueapp.entity.Team;
 import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.mapping.impl.FromTeamModelToTeam;
 import com.ifelseco.issueapp.mapping.impl.FromTeamToTeamModel;
+import com.ifelseco.issueapp.model.BaseResponseModel;
 import com.ifelseco.issueapp.model.EmailModel;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
@@ -27,6 +28,7 @@ public class TeamServiceImpl implements TeamService {
     private final FromTeamToTeamModel fromTeamToTeamModel;
     private final ConfirmUserService confirmUserService;
     private final EmailService emailService;
+
 
 
     public TeamServiceImpl(TeamRepository teamRepository,
@@ -53,12 +55,14 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void addDevelopers(List<Long> developersIds,Principal principal) {
+    public void addDevelopers(List<Long> developersIds, Principal principal, Long teamId) {
         for(long id: developersIds){
             User user = userRepository.findById(id)
                     .orElseThrow(NoSuchElementException::new);
-            sendConfirmEmail(user,emailService);
+            sendInvitationEmail(user,emailService);
         }
+        //TODO: user should be added to teams developers list
+
     }
 
     @Override
@@ -70,15 +74,14 @@ public class TeamServiceImpl implements TeamService {
     public void delete(long Id) {
 
     }
-    private void sendConfirmEmail(User developer, EmailService emailService) {
+
+    private void sendInvitationEmail(User developer, EmailService emailService) {
 
         ConfirmUserToken confirmUserToken = new ConfirmUserToken();
         confirmUserToken.setToken(UUID.randomUUID().toString());
         confirmUserToken.setExpiryDate(60*24);
         confirmUserToken.setUser(developer);
         confirmUserService.save(confirmUserToken);
-
-
 
         Map<String, Object> model = new HashMap<>();
         model.put("firstName",developer.getFirstname());
@@ -90,6 +93,25 @@ public class TeamServiceImpl implements TeamService {
         emailService.sendInvitationEmail(emailModel);
 
     }
+
+    public Boolean confirmInvitationEmail(String uuid) {
+
+        BaseResponseModel responseModel=new BaseResponseModel();
+
+        ConfirmUserToken confirmUserToken=confirmUserService.findByToken(uuid);
+
+        User user=userRepository.findByEmail(confirmUserToken.getUser().getEmail());
+
+         return true;
+
+    }
+
+
+
+
+
+
+
 
 
 
