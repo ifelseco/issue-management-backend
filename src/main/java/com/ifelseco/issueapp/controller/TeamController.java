@@ -33,14 +33,15 @@ public class TeamController {
     @PostMapping("/add/{teamId}")
    //     [2,6] will be sent from postman
     public ResponseEntity addSelectedDevelopers(@Valid @RequestBody List<Long> developersIds, Principal principal, @PathVariable Long teamId){
-        teamService.addDevelopers(developersIds,principal,teamId);
+        teamService.sendInvitationToSelectedDevelopers(developersIds,principal,teamId);
         return new ResponseEntity("Developers are invited success", HttpStatus.OK);
     }
 
-    @GetMapping("/confirm-invitation-email")
-    public ResponseEntity confirmInvitationEmail(@RequestParam("uuid") String uuid) {
 
-        //TODO: user should be added to teams developers list
+
+    @GetMapping("/invitation-confirm-email")
+    public ResponseEntity confirmInvitationEmail(@RequestParam("uuid") String uuid,@RequestParam("teamId") Long teamId) {
+        teamService.confirmInvitationEmail(uuid,teamId);
 
         return new ResponseEntity<>("Joining the team has been successfully completed", HttpStatus.OK);
     }

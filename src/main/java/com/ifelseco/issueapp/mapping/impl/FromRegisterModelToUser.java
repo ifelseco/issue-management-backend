@@ -8,9 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by Moon on 1/23/2021
- */
+
 @Service
 public class FromRegisterModelToUser implements Converter<RegisterModel, User> {
 
