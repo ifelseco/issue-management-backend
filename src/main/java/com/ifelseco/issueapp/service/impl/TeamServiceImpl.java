@@ -11,6 +11,7 @@ import com.ifelseco.issueapp.service.TeamService;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,6 +34,7 @@ public class TeamServiceImpl implements TeamService {
         User user = userRepository.findByUsername(principal.getName());
         Team team = fromTeamModelToTeam.convert(teamModel);
         team.setCreatedBy(user.getId());
+        team.setCreateTime(new Date());
         TeamModel teamModel1 = fromTeamToTeamModel.convert(teamRepository.save(team));
         return teamModel1;
     }
