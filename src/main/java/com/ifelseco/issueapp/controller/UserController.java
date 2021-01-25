@@ -55,7 +55,7 @@ public class UserController {
                         return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
                     }else {
                         user.setEnabled(true);
-                        userService.save(user);
+                        userService.createUser(user);
                         responseModel.setResponseCode(200);
                         responseModel.setResponseMessage("Kullanıcı onaylandı. Artık giriş yapabilirsiniz.");
                         return new ResponseEntity<>(responseModel, HttpStatus.OK);

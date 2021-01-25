@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.ifelseco.issueapp.config.ConstApp.*;
+import static com.ifelseco.issueapp.config.AppConstants.*;
 
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {

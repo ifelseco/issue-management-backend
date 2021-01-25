@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import static com.ifelseco.issueapp.config.ConstApp.*;
+import static com.ifelseco.issueapp.config.AppConstants.*;
 
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

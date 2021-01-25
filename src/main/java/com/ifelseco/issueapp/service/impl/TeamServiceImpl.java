@@ -1,12 +1,10 @@
 package com.ifelseco.issueapp.service.impl;
 
-import com.ifelseco.issueapp.config.ConstApp;
+import com.ifelseco.issueapp.config.AppConstants;
+import com.ifelseco.issueapp.config.EmailConstants;
 import com.ifelseco.issueapp.entity.ConfirmUserToken;
 import com.ifelseco.issueapp.entity.Team;
 import com.ifelseco.issueapp.entity.User;
-import com.ifelseco.issueapp.mapping.impl.FromTeamModelToTeam;
-import com.ifelseco.issueapp.mapping.impl.FromTeamToTeamModel;
-import com.ifelseco.issueapp.model.BaseResponseModel;
 import com.ifelseco.issueapp.model.EmailModel;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
@@ -14,6 +12,9 @@ import com.ifelseco.issueapp.repository.UserRepository;
 import com.ifelseco.issueapp.service.ConfirmUserService;
 import com.ifelseco.issueapp.service.EmailService;
 import com.ifelseco.issueapp.service.TeamService;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -22,10 +23,10 @@ import java.util.*;
 @Service
 public class TeamServiceImpl implements TeamService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TeamServiceImpl.class);
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
-    private final FromTeamModelToTeam fromTeamModelToTeam;
-    private final FromTeamToTeamModel fromTeamToTeamModel;
+    private final ModelMapper modelMapper;
     private final ConfirmUserService confirmUserService;
     private final EmailService emailService;
 
@@ -33,14 +34,12 @@ public class TeamServiceImpl implements TeamService {
 
     public TeamServiceImpl(TeamRepository teamRepository,
                            UserRepository userRepository,
-                           FromTeamModelToTeam fromTeamModelToTeam,
-                           FromTeamToTeamModel fromTeamToTeamModel,
+                           ModelMapper modelMapper,
                            ConfirmUserService confirmUserService,
                            EmailService emailService) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
-        this.fromTeamModelToTeam = fromTeamModelToTeam;
-        this.fromTeamToTeamModel = fromTeamToTeamModel;
+        this.modelMapper = modelMapper;
         this.emailService = emailService;
         this.confirmUserService = confirmUserService;
     }
@@ -48,24 +47,32 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamModel create(TeamModel teamModel, Principal principal) {
         User user = userRepository.findByUsername(principal.getName());
-        Team team = fromTeamModelToTeam.convert(teamModel);
+        Team team = modelMapper.map(teamModel,Team.class);
         Set<User> userSet=new HashSet<>();
         userSet.add(user);
         team.setMembers(userSet);
-
         team.setCreatedBy(user.getId());
-
-        TeamModel teamModel1 = fromTeamToTeamModel.convert(teamRepository.save(team));
+        TeamModel teamModel1 = modelMapper.map(teamRepository.save(team),TeamModel.class);
         return teamModel1;
     }
 
     @Override
     public void sendInvitationToSelectedDevelopers(List<Long> developersIds, Principal principal, Long teamId) {
-        for(long id: developersIds){
-            User user = userRepository.findById(id)
-                    .orElseThrow(NoSuchElementException::new);
-            sendInvitationEmail(teamId,user,emailService);
+        try{
+            Team team=teamRepository.findById(teamId).orElseThrow(NoSuchElementException::new);
+            if(team!=null) {
+                for(long id: developersIds){
+                    User user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+                    emailService.sendConfirmationToDeveloper(user,team);
+                }
+            }else {
+                LOG.error("Team id is not valid");
+            }
+
+        }catch(Exception e){
+            LOG.error("Team or user is not valid",e.getMessage());
         }
+
 
     }
 
@@ -76,26 +83,6 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public void delete(long Id) {
-
-    }
-
-    private void sendInvitationEmail( Long teamId,User developer, EmailService emailService) {
-
-        ConfirmUserToken confirmUserToken = new ConfirmUserToken();
-        confirmUserToken.setToken(UUID.randomUUID().toString());
-        confirmUserToken.setExpiryDate(60*24);
-        confirmUserToken.setUser(developer);
-        confirmUserService.save(confirmUserToken);
-
-
-        Map<String, Object> model = new HashMap<>();
-        model.put("firstName",developer.getFirstname());
-        model.put("confirmUrl", ConstApp.WEB_URL+"/team/invitation-confirm-email?uuid="+confirmUserToken.getToken()+"&teamId="+teamId);
-        model.put("signature","Issue Management");
-
-        EmailModel emailModel=new EmailModel(ConstApp.FROM_EMAIL,developer.getEmail(),"Issue Management: Invitation Confirm",model);
-
-        emailService.sendInvitationEmail(emailModel);
 
     }
 
