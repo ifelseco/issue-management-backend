@@ -1,10 +1,11 @@
 package com.ifelseco.issueapp.service;
 
 import com.ifelseco.issueapp.entity.ConfirmUserToken;
+import com.ifelseco.issueapp.entity.User;
 
 public interface ConfirmUserService {
     ConfirmUserToken findByToken(String token);
-    ConfirmUserToken save(ConfirmUserToken confirmUserToken);
+    ConfirmUserToken createToken(User user);
     void delete(ConfirmUserToken confirmUserToken);
 
 }

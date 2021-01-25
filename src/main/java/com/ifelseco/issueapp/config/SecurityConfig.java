@@ -1,6 +1,6 @@
 package com.ifelseco.issueapp.config;
 
-import com.ifelseco.issueapp.service.UserDetailsServiceImpl;
+import com.ifelseco.issueapp.service.UserSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +20,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    private UserDetailsServiceImpl userDetailsService;
+    private UserSecurityService userSecurityService;
     
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService){
-        this.userDetailsService = userDetailsService;
+    public SecurityConfig(UserSecurityService userSecurityService){
+        this.userSecurityService = userSecurityService;
     }
 
 
@@ -56,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public  void configureGLobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userSecurityService).passwordEncoder(passwordEncoder());
     }
 
     @Bean

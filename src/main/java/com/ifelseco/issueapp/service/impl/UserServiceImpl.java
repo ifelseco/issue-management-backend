@@ -1,7 +1,9 @@
 package com.ifelseco.issueapp.service.impl;
 
-import com.ifelseco.issueapp.config.ConstApp;
+import com.ifelseco.issueapp.config.AppConstants;
+import com.ifelseco.issueapp.config.SecurityUtility;
 import com.ifelseco.issueapp.entity.ConfirmUserToken;
+import com.ifelseco.issueapp.entity.Role;
 import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.entity.UserRole;
 import com.ifelseco.issueapp.model.EmailModel;
@@ -12,92 +14,31 @@ import com.ifelseco.issueapp.service.EmailService;
 import com.ifelseco.issueapp.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOG= LoggerFactory.getLogger(UserServiceImpl.class);
-
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private RoleRepository roleRepository;
-
-    @Autowired
     private EmailService emailService;
-
-    @Autowired
     private ConfirmUserService confirmUserService;
 
-    @Transactional
-    public User createUser(User user, Set<UserRole> userRoles) {
-
-        User savedUser=userRepository.findByUsername(user.getUsername());
-
-        if (savedUser!=null) {
-            LOG.info("User with username {} already exist."+user.getUsername());
-        }else{
-            for (UserRole ur : userRoles) {
-                roleRepository.save(ur.getRole());
-            }
-            user.getUserRoles().addAll(userRoles);
-
-
-            savedUser=userRepository.save(user);
-
-            if(savedUser.getId()>-1) {
-                try {
-                    sendConfirmEmail(savedUser,emailService);
-                }catch(Exception e) {
-                    LOG.error("Email error {} "+e.getMessage());
-                }
-            }
-
-
-        }
-
-        return savedUser;
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           EmailService emailService,
+                           ConfirmUserService confirmUserService) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.emailService = emailService;
+        this.confirmUserService = confirmUserService;
     }
 
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
-
-    private void sendConfirmEmail(User savedUser, EmailService emailService) {
-
-        // create confirm token
-        // send it to user via link
-
-        ConfirmUserToken confirmUserToken=new ConfirmUserToken();
-        confirmUserToken.setToken(UUID.randomUUID().toString());
-        confirmUserToken.setExpiryDate(60*24);
-        confirmUserToken.setUser(savedUser);
-        confirmUserService.save(confirmUserToken);
-
-
-
-        Map<String, Object> model = new HashMap<>();
-        model.put("firstName",savedUser.getFirstname());
-        model.put("confirmUrl", ConstApp.WEB_URL+"/user/confirm-email?uuid="+confirmUserToken.getToken());
-        model.put("signature","Issue Management");
-
-        EmailModel emailModel=new EmailModel(ConstApp.FROM_EMAIL,savedUser.getEmail(),"Issue Management: E-posta doğrulama",model);
-
-        emailService.sendEmail(emailModel);
-
-    }
 
     @Override
     public User findByUsername(String username) {
@@ -110,6 +51,50 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findByEmail(email);
     }
+
+    @Transactional
+    public User createUser(User user) {
+
+        User savedUser=userRepository.findByUsername(user.getUsername());
+
+        if (savedUser!=null) {
+            LOG.info("User with username {} already exist."+user.getUsername());
+        }else{
+            user.setPassword(SecurityUtility.passwordEncoder().encode(user.getPassword()));
+            Set<UserRole> userRoles = createRole(user,"ROLE_LEAD");
+            user.getUserRoles().addAll(userRoles);
+            savedUser=userRepository.save(user);
+            sendMail(savedUser);
+
+        }
+
+        return savedUser;
+    }
+
+    private void sendMail(User savedUser) {
+        if(savedUser!=null) {
+            try {
+                emailService.sendConfirmationToLead(savedUser);
+            }catch(Exception e) {
+                LOG.error("Email error {} "+e.getMessage());
+            }
+        }
+    }
+
+    private Set<UserRole> createRole(User user,String roleName) {
+        Role role = new Role();
+        role.setRoleId(1);
+        role.setName(roleName);
+        Set<UserRole> userRoles = new HashSet<>();
+        userRoles.add(new UserRole(user, role));
+
+        for (UserRole ur : userRoles) {
+            roleRepository.save(ur.getRole());
+        }
+        return userRoles;
+    }
+
+
 
 
 
