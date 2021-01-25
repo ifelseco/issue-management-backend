@@ -1,6 +1,5 @@
 package com.ifelseco.issueapp.service.impl;
 
-import com.ifelseco.issueapp.config.AppConstants;
 import com.ifelseco.issueapp.config.EmailConstants;
 import com.ifelseco.issueapp.entity.ConfirmUserToken;
 import com.ifelseco.issueapp.entity.Team;
@@ -19,7 +18,6 @@ import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -29,9 +27,12 @@ public class EmailServiceImpl implements EmailService {
     private SpringTemplateEngine templateEngine;
     private ConfirmUserService confirmUserService;
 
-    public EmailServiceImpl(JavaMailSender emailSender, SpringTemplateEngine templateEngine) {
+    public EmailServiceImpl(JavaMailSender emailSender,
+                            SpringTemplateEngine templateEngine,
+                            ConfirmUserService confirmUserService) {
         this.emailSender = emailSender;
         this.templateEngine = templateEngine;
+        this.confirmUserService=confirmUserService;
     }
 
     @Override
@@ -76,7 +77,8 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName",user.getFirstname());
         model.put("signature","Issue Management");
-        model.put("confirmUrl", EmailConstants.CONFIRM_USER_EMAIL_URL+confirmUserToken.getToken()+team!=null?"&teamId="+team.getId() : "" );
+        String teamUrl = team==null ? "" : "&teamId="+team.getId();
+        model.put("confirmUrl", EmailConstants.CONFIRM_USER_EMAIL_URL+confirmUserToken.getToken()+teamUrl );
 
         return new EmailModel(EmailConstants.FROM_EMAIL,user.getEmail(),
                 "Issue Management: E-posta doğrulama", EmailConstants.CONFIRM_USER_TEMPLATE,model);
