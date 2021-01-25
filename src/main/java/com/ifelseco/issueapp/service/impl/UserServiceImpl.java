@@ -1,12 +1,9 @@
 package com.ifelseco.issueapp.service.impl;
 
-import com.ifelseco.issueapp.config.AppConstants;
-import com.ifelseco.issueapp.config.SecurityUtility;
-import com.ifelseco.issueapp.entity.ConfirmUserToken;
+import com.ifelseco.issueapp.security.SecurityUtility;
 import com.ifelseco.issueapp.entity.Role;
 import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.entity.UserRole;
-import com.ifelseco.issueapp.model.EmailModel;
 import com.ifelseco.issueapp.repository.RoleRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
 import com.ifelseco.issueapp.service.ConfirmUserService;

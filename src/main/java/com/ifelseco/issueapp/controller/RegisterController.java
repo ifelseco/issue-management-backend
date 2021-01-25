@@ -1,9 +1,6 @@
 package com.ifelseco.issueapp.controller;
 
-import com.ifelseco.issueapp.config.SecurityUtility;
-import com.ifelseco.issueapp.entity.Role;
 import com.ifelseco.issueapp.entity.User;
-import com.ifelseco.issueapp.entity.UserRole;
 import com.ifelseco.issueapp.model.ErrorModel;
 import com.ifelseco.issueapp.model.RegisterModel;
 import com.ifelseco.issueapp.service.UserService;
@@ -18,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController

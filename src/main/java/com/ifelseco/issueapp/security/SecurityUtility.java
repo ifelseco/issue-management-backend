@@ -1,4 +1,4 @@
-package com.ifelseco.issueapp.config;
+package com.ifelseco.issueapp.security;
 
 
 import org.springframework.context.annotation.Bean;

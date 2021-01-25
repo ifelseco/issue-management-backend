@@ -1,4 +1,4 @@
-package com.ifelseco.issueapp.config;
+package com.ifelseco.issueapp.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

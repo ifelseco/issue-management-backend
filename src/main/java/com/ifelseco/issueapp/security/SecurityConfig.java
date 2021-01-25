@@ -1,4 +1,4 @@
-package com.ifelseco.issueapp.config;
+package com.ifelseco.issueapp.security;
 
 import com.ifelseco.issueapp.service.UserSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
