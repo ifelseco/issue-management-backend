@@ -8,6 +8,7 @@ import com.ifelseco.issueapp.repository.RoleRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
 import com.ifelseco.issueapp.service.ConfirmUserService;
 import com.ifelseco.issueapp.service.EmailService;
+import com.ifelseco.issueapp.service.RoleService;
 import com.ifelseco.issueapp.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +26,17 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
     private EmailService emailService;
     private ConfirmUserService confirmUserService;
+    private final RoleService roleService;
 
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
                            EmailService emailService,
-                           ConfirmUserService confirmUserService) {
+                           ConfirmUserService confirmUserService, RoleService roleService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.emailService = emailService;
         this.confirmUserService = confirmUserService;
+        this.roleService = roleService;
     }
 
 
@@ -50,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public User createUser(User user) {
+    public User createLead(User user) {
 
         User savedUser=userRepository.findByUsername(user.getUsername());
 
@@ -58,14 +61,33 @@ public class UserServiceImpl implements UserService {
             LOG.info("User with username {} already exist."+user.getUsername());
         }else{
             user.setPassword(SecurityUtility.passwordEncoder().encode(user.getPassword()));
-            Set<UserRole> userRoles = createRole(user,"ROLE_LEAD");
-            user.getUserRoles().addAll(userRoles);
+            createUserRole(user, "ROLE_LEAD");
             savedUser=userRepository.save(user);
             sendMail(savedUser);
+        }
+        return savedUser;
+    }
 
+    private void createUserRole(User user,String roleName) {
+        Set<UserRole> userRoles = new HashSet<>();
+        Role roleLead = roleService.findByName(roleName);
+
+        if(roleLead != null){
+            userRoles.add(new UserRole(user,roleLead));
         }
 
-        return savedUser;
+        userRoles.forEach(ur -> roleRepository.save(ur.getRole()));
+        user.getUserRoles().addAll(userRoles);
+    }
+
+    //todo - create a method to save developer
+
+    @Transactional
+    public User createDeveloper(User user) {
+            createUserRole(user,"ROLE_DEV");
+//            user.getUserRoles().addAll(userRoles);
+            user = userRepository.save(user);
+        return user;
     }
 
     private void sendMail(User savedUser) {
@@ -77,22 +99,6 @@ public class UserServiceImpl implements UserService {
             }
         }
     }
-
-    private Set<UserRole> createRole(User user,String roleName) {
-        Role role = new Role();
-        role.setRoleId(1);
-        role.setName(roleName);
-        Set<UserRole> userRoles = new HashSet<>();
-        userRoles.add(new UserRole(user, role));
-
-        for (UserRole ur : userRoles) {
-            roleRepository.save(ur.getRole());
-        }
-        return userRoles;
-    }
-
-
-
 
 
 }

@@ -35,8 +35,4 @@ public class UserRole implements Serializable {
     private long userRoleId;
 
 
-
-
-
-
 }

@@ -1,6 +1,6 @@
 package com.ifelseco.issueapp.service.impl;
 
-import com.ifelseco.issueapp.config.EmailConstants;
+import static com.ifelseco.issueapp.config.EmailConstants.*;
 import com.ifelseco.issueapp.entity.ConfirmUserToken;
 import com.ifelseco.issueapp.entity.Team;
 import com.ifelseco.issueapp.entity.User;
@@ -26,6 +26,7 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender emailSender;
     private SpringTemplateEngine templateEngine;
     private ConfirmUserService confirmUserService;
+
 
     public EmailServiceImpl(JavaMailSender emailSender,
                             SpringTemplateEngine templateEngine,
@@ -77,11 +78,19 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName",user.getFirstname());
         model.put("signature","Issue Management");
-        String teamUrl = team==null ? "" : "&teamId="+team.getId();
-        model.put("confirmUrl", EmailConstants.CONFIRM_USER_EMAIL_URL+confirmUserToken.getToken()+teamUrl );
 
-        return new EmailModel(EmailConstants.FROM_EMAIL,user.getEmail(),
-                "Issue Management: E-posta doğrulama", EmailConstants.CONFIRM_USER_TEMPLATE,model);
+        if(team != null){
+            String teamUrl = "&teamId="+team.getId();
+            model.put("confirmUrl", CONFIRM_DEVELOPER_EMAIL_URL+confirmUserToken.getToken()+teamUrl);
+            return new EmailModel(FROM_EMAIL,user.getEmail(),
+                    "Issue Management: Confirm Invitation To Team", CONFIRM_DEVELOPER_INVITATION_TEMPLATE,model);
+        }else{
+            model.put("confirmUrl", CONFIRM_USER_EMAIL_URL+confirmUserToken.getToken());
+            return new EmailModel(FROM_EMAIL,user.getEmail(),
+                    "Issue Management: Confirm Email",CONFIRM_USER_TEMPLATE,model);
+        }
+
+
     }
 
 
