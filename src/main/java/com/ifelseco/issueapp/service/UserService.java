@@ -7,7 +7,8 @@ import java.util.Set;
 
 public interface UserService {
 
-    User createUser(User user);
+    User createLead(User user);
+    User createDeveloper(User user);
     User findByUsername(String username);
     User findByEmail(String email);
 

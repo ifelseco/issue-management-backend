@@ -32,6 +32,7 @@ public class User implements UserDetails , Serializable {
     private boolean deletedUser;
     private boolean enabled;
     private boolean accountNonLocked=true;
+    private boolean isCandidate;
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)

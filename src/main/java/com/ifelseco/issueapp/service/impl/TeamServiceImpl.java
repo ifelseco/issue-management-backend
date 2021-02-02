@@ -1,16 +1,12 @@
 package com.ifelseco.issueapp.service.impl;
 
-import com.ifelseco.issueapp.config.AppConstants;
-import com.ifelseco.issueapp.config.EmailConstants;
-import com.ifelseco.issueapp.entity.ConfirmUserToken;
-import com.ifelseco.issueapp.entity.Team;
-import com.ifelseco.issueapp.entity.User;
-import com.ifelseco.issueapp.model.EmailModel;
+import com.ifelseco.issueapp.entity.*;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
 import com.ifelseco.issueapp.service.ConfirmUserService;
 import com.ifelseco.issueapp.service.EmailService;
+import com.ifelseco.issueapp.service.RoleService;
 import com.ifelseco.issueapp.service.TeamService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -30,6 +26,8 @@ public class TeamServiceImpl implements TeamService {
     private final ModelMapper modelMapper;
     private final ConfirmUserService confirmUserService;
     private final EmailService emailService;
+    private final UserServiceImpl userServiceImpl;
+    private final RoleService roleService;
 
 
 
@@ -37,12 +35,14 @@ public class TeamServiceImpl implements TeamService {
                            UserRepository userRepository,
                            ModelMapper modelMapper,
                            ConfirmUserService confirmUserService,
-                           EmailService emailService) {
+                           EmailService emailService, UserServiceImpl userServiceImpl, RoleService roleService) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.emailService = emailService;
         this.confirmUserService = confirmUserService;
+        this.userServiceImpl = userServiceImpl;
+        this.roleService = roleService;
     }
 
     @Override
@@ -59,14 +59,21 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void sendInvitationToSelectedDevelopers(List<Long> developersIds, Principal principal, Long teamId) {
+    public void sendInvitationToDeveloper(String email, Principal principal, Long teamId) {
         try{
             Team team=teamRepository.findById(teamId).orElseThrow(NoSuchElementException::new);
             if(team!=null) {
-                for(long id: developersIds){
-                    User user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+                    User user = userRepository.findByEmail(email);
+
+                    if(user == null) {
+                        User newUser = new User();
+                        newUser.setEmail(email);
+                        newUser.setCandidate(true);
+                        user = userRepository.save(newUser);
+                    }
+
                     emailService.sendConfirmationToDeveloper(user,team);
-                }
+
             }else {
                 LOG.error("Team id is not valid");
             }
@@ -74,7 +81,6 @@ public class TeamServiceImpl implements TeamService {
         }catch(Exception e){
             LOG.error("Team or user is not valid",e.getMessage());
         }
-
 
     }
 
@@ -90,13 +96,33 @@ public class TeamServiceImpl implements TeamService {
 
     public User confirmInvitationEmail(String uuid,Long teamId) {
 
+        //todo: Check if token is valid - exception handling - think of using try catch if you are interacted with db
         ConfirmUserToken confirmUserToken=confirmUserService.findByToken(uuid);
 
         User user=userRepository.findByEmail(confirmUserToken.getUser().getEmail());
+        //if this user is a new user
+        if(user.isCandidate()) {
+            return user;
+        }else{
+            if(!checkDev(user)) {
+                Role devRole = roleService.findByName("ROLE_DEV");
+                user.getUserRoles().add(new UserRole(user, devRole));
+            }
 
-        addDeveloperToTeam(user,teamId);
-         return user;
+            addDeveloperToTeam(user,teamId);
+            return user;
+        }
+    }
 
+    private boolean checkDev(User user) {
+        boolean isDev = false;
+        Set<UserRole> userRoles = user.getUserRoles();
+        for (UserRole ur : userRoles){
+            if(ur.getRole().getName().equals("ROLE_DEV")){
+                isDev = true;
+            }
+        }
+        return isDev;
     }
 
     private void addDeveloperToTeam(User user, Long teamId) {
@@ -105,6 +131,5 @@ public class TeamServiceImpl implements TeamService {
         team.getMembers().add(user);
         teamRepository.save(team);
     }
-
 
 }

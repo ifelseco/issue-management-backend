@@ -1,9 +1,7 @@
 package com.ifelseco.issueapp.controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ifelseco.issueapp.entity.ConfirmUserToken;
+
 import com.ifelseco.issueapp.entity.User;
-import com.ifelseco.issueapp.model.BaseResponseModel;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.service.TeamService;
 import org.springframework.http.HttpStatus;
@@ -31,19 +29,21 @@ public class TeamController {
     }
 
     @PostMapping("/add/{teamId}")
-   //     [2,6] will be sent from postman
-    public ResponseEntity addSelectedDevelopers(@Valid @RequestBody List<Long> developersIds, Principal principal, @PathVariable Long teamId){
-        teamService.sendInvitationToSelectedDevelopers(developersIds,principal,teamId);
+    public ResponseEntity addDevelopersByEmail(@Valid @RequestBody String email, Principal principal, @PathVariable Long teamId){
+        teamService.sendInvitationToDeveloper(email,principal,teamId);
         return new ResponseEntity("Developers are invited success", HttpStatus.OK);
     }
 
 
 
     @GetMapping("/invitation-confirm-email")
-    public ResponseEntity confirmInvitationEmail(@RequestParam("uuid") String uuid,@RequestParam("teamId") Long teamId) {
-        teamService.confirmInvitationEmail(uuid,teamId);
+    public ResponseEntity<User> confirmInvitationEmail(@RequestParam("uuid") String uuid,@RequestParam("teamId") Long teamId) {
+        User user = teamService.confirmInvitationEmail(uuid,teamId);
 
-        return new ResponseEntity<>("Joining the team has been successfully completed", HttpStatus.OK);
+        return new ResponseEntity<User>(user,HttpStatus.OK);
+
     }
+
+
 
 }
