@@ -4,22 +4,25 @@ import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.model.ErrorModel;
 import com.ifelseco.issueapp.model.RegisterModel;
 import com.ifelseco.issueapp.service.UserService;
+import io.swagger.annotations.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import org.springframework.validation.Errors;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/register")
+@RequestMapping(path = "/api/register")
+@Api("/api/register")
 public class RegisterController {
 
     private final UserService userService;
@@ -31,8 +34,18 @@ public class RegisterController {
         this.modelMapper = modelMapper;
     }
 
+
     @PostMapping
-    public ResponseEntity register(@Valid @RequestBody RegisterModel registerModel, Errors errors) {
+    @ApiOperation(value = "Register Lead", notes = "Register team lead.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity register(
+            @ApiParam(required = true, name = "Lead", value = "Lead")
+            @Valid @RequestBody RegisterModel registerModel,
+            Errors errors) {
 
         if (errors.hasErrors()) {
             return new ResponseEntity(convertValidationErrors(errors), HttpStatus.BAD_REQUEST);
@@ -44,7 +57,7 @@ public class RegisterController {
             } else {
                 try {
                     User savingUser = modelMapper.map(registerModel, User.class);
-                    savingUser = userService.createUser(savingUser);
+                    savingUser = userService.createLead(savingUser);
                     return new ResponseEntity("User registered successfully, userId: " + savingUser.getId(), HttpStatus.OK);
                 } catch (Exception e) {
                     return new ResponseEntity("Db Error", HttpStatus.INTERNAL_SERVER_ERROR);

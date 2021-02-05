@@ -9,6 +9,7 @@ public interface UserService {
 
     User createLead(User user);
     User createDeveloper(User user);
+    User createAdmin(User user);
     User findByUsername(String username);
     User findByEmail(String email);
 

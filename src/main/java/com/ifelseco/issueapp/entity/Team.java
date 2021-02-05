@@ -20,11 +20,14 @@ public class Team implements Serializable {
 
 
     @OneToMany
-    //@JoinTable(name = "team_members", joinColumns = @JoinColumn(name = "team_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> members;
 
+    @ManyToOne
+    @JoinColumn(name = "tenant_id")
+    private Tenant tenant;
+
     @OneToMany
-    @JoinTable(name = "team_project", joinColumns = @JoinColumn(name = "team_id"), inverseJoinColumns = @JoinColumn(name = "project_id"))
+    //@JoinTable(name = "team_project", joinColumns = @JoinColumn(name = "team_id"), inverseJoinColumns = @JoinColumn(name = "project_id"))
     private Set<Project> projects;
 
 

@@ -39,6 +39,10 @@ public class User implements UserDetails , Serializable {
     @EqualsAndHashCode.Exclude private Set<UserRole> userRoles=new HashSet<>();
 
 
+    @ManyToOne
+    @JoinColumn(name = "tenant_id")
+    private Tenant tenant;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

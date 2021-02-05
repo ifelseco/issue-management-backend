@@ -85,9 +85,16 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User createDeveloper(User user) {
             createUserRole(user,"ROLE_DEV");
-//            user.getUserRoles().addAll(userRoles);
             user = userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public User createAdmin(User user) {
+        user.setPassword(SecurityUtility.passwordEncoder().encode(user.getPassword()));
+        user.setEnabled(true);
+        createUserRole(user,"ROLE_ADMIN");
+        return userRepository.save(user);
     }
 
     private void sendMail(User savedUser) {

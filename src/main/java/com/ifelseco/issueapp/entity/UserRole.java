@@ -21,12 +21,10 @@ public class UserRole implements Serializable {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
     @EqualsAndHashCode.Exclude private User user;
 
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="role_id")
     @EqualsAndHashCode.Exclude private Role role;
 
 

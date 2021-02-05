@@ -6,13 +6,14 @@ import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.model.BaseResponseModel;
 import com.ifelseco.issueapp.service.ConfirmUserService;
 import com.ifelseco.issueapp.service.UserService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/user")
+@RequestMapping(path = "/api/user")
 public class UserController {
 
     private ConfirmUserService confirmUserService;
@@ -24,8 +25,11 @@ public class UserController {
         this.userService=userService;
     }
 
+
+
     @GetMapping("/confirm-email")
-    public ResponseEntity<BaseResponseModel> confirmUserEmail(@RequestParam("uuid") String uuid) {
+    public ResponseEntity<BaseResponseModel> confirmUserEmail(
+            @RequestParam("uuid") String uuid) {
 
 
         BaseResponseModel responseModel=new BaseResponseModel();
@@ -55,7 +59,7 @@ public class UserController {
                         return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
                     }else {
                         user.setEnabled(true);
-                        userService.createUser(user);
+                        userService.createLead(user);
                         responseModel.setResponseCode(200);
                         responseModel.setResponseMessage("Kullanıcı onaylandı. Artık giriş yapabilirsiniz.");
                         return new ResponseEntity<>(responseModel, HttpStatus.OK);
@@ -76,8 +80,6 @@ public class UserController {
         }
 
     }
-
-
 
 
 

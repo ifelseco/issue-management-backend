@@ -4,10 +4,7 @@ import com.ifelseco.issueapp.entity.*;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
-import com.ifelseco.issueapp.service.ConfirmUserService;
-import com.ifelseco.issueapp.service.EmailService;
-import com.ifelseco.issueapp.service.RoleService;
-import com.ifelseco.issueapp.service.TeamService;
+import com.ifelseco.issueapp.service.*;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +25,7 @@ public class TeamServiceImpl implements TeamService {
     private final EmailService emailService;
     private final UserServiceImpl userServiceImpl;
     private final RoleService roleService;
+    private final TenantService tenantService;
 
 
 
@@ -35,7 +33,7 @@ public class TeamServiceImpl implements TeamService {
                            UserRepository userRepository,
                            ModelMapper modelMapper,
                            ConfirmUserService confirmUserService,
-                           EmailService emailService, UserServiceImpl userServiceImpl, RoleService roleService) {
+                           EmailService emailService, UserServiceImpl userServiceImpl, RoleService roleService, TenantService tenantService) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
@@ -43,17 +41,20 @@ public class TeamServiceImpl implements TeamService {
         this.confirmUserService = confirmUserService;
         this.userServiceImpl = userServiceImpl;
         this.roleService = roleService;
+        this.tenantService = tenantService;
     }
 
     @Override
     public TeamModel create(TeamModel teamModel, Principal principal) {
         User user = userRepository.findByUsername(principal.getName());
+        Tenant tenant=user.getTenant();
         Team team = modelMapper.map(teamModel,Team.class);
         Set<User> userSet=new HashSet<>();
         userSet.add(user);
         team.setMembers(userSet);
         team.setCreatedBy(user.getId());
         team.setCreateTime(new Date());
+        team.setTenant(tenant);
         TeamModel teamModel1 = modelMapper.map(teamRepository.save(team),TeamModel.class);
         return teamModel1;
     }

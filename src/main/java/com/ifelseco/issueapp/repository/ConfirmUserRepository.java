@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConfirmUserRepository extends CrudRepository<ConfirmUserToken,Long> {
     ConfirmUserToken findByToken(String token);
-
 }

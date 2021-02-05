@@ -1,5 +1,6 @@
 package com.ifelseco.issueapp.security;
 
+import com.ifelseco.issueapp.config.JWTConstants;
 import com.ifelseco.issueapp.entity.User;
 import org.springframework.security.authentication.AuthenticationManager;
 
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import static com.ifelseco.issueapp.config.AppConstants.*;
 
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -56,8 +56,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(HMAC512(SECRET.getBytes()));
-        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+                .withExpiresAt(new Date(System.currentTimeMillis() + JWTConstants.EXPIRATION_TIME))
+                .sign(HMAC512(JWTConstants.SECRET.getBytes()));
+        res.addHeader(JWTConstants.HEADER_STRING, JWTConstants.TOKEN_PREFIX + token);
     }
 }
