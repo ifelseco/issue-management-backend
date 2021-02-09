@@ -1,28 +1,20 @@
 package com.ifelseco.issueapp.controller;
 
 import com.ifelseco.issueapp.entity.User;
-import com.ifelseco.issueapp.model.ErrorModel;
+import com.ifelseco.issueapp.exceptionhandling.NotUniqueException;
 import com.ifelseco.issueapp.model.RegisterModel;
 import com.ifelseco.issueapp.service.UserService;
-import io.swagger.annotations.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import org.springframework.validation.Errors;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/register")
-@Api("/api/register")
+//@Api("/api/register")
 public class RegisterController {
 
     private final UserService userService;
@@ -36,40 +28,57 @@ public class RegisterController {
 
 
     @PostMapping
-    @ApiOperation(value = "Register Lead", notes = "Register team lead.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 400, message = "Bad request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
-    public ResponseEntity register(
-            @ApiParam(required = true, name = "Lead", value = "Lead")
-            @Valid @RequestBody RegisterModel registerModel,
-            Errors errors) {
+//    @ApiOperation(value = "Register Lead", notes = "Register team lead.")
+//    @ApiResponses({
+//            @ApiResponse(code = 200, message = "Success"),
+//            @ApiResponse(code = 400, message = "Bad request"),
+//            @ApiResponse(code = 500, message = "Internal Server Error")
+//    })
 
-        if (errors.hasErrors()) {
-            return new ResponseEntity(convertValidationErrors(errors), HttpStatus.BAD_REQUEST);
-        } else {
-            if (userService.findByEmail(registerModel.getEmail()) != null) {
-                return new ResponseEntity("Email has already registered", HttpStatus.BAD_REQUEST);
-            } else if (userService.findByUsername(registerModel.getUsername()) != null) {
-                return new ResponseEntity("Username has already registered", HttpStatus.BAD_REQUEST);
-            } else {
-                try {
-                    User savingUser = modelMapper.map(registerModel, User.class);
-                    savingUser = userService.createLead(savingUser);
-                    return new ResponseEntity("User registered successfully, userId: " + savingUser.getId(), HttpStatus.OK);
-                } catch (Exception e) {
-                    return new ResponseEntity("Db Error", HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
+    public ResponseEntity register(@Valid @RequestBody RegisterModel registerModel) throws NotUniqueException {
+
+        if (userService.findByEmail(registerModel.getEmail()) != null) {
+            throw new NotUniqueException("Email");
+        } else if (userService.findByUsername(registerModel.getUsername()) != null) {
+            throw new NotUniqueException("Username");
+        }
+
+        try {
+            User savingUser = modelMapper.map(registerModel, User.class);
+            savingUser = userService.createLead(savingUser);
+            return new ResponseEntity("User registered successfully, userId: " + savingUser.getId(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity("Db Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
-    private List<ErrorModel> convertValidationErrors(Errors errors) {
-        return errors.getFieldErrors().stream()
-                .map(err -> new ErrorModel(err.getField(), err.getDefaultMessage()))
-                .collect(Collectors.toList());
-    }
+//    private List<ErrorModel> convertValidationErrors(Errors errors) {
+//        return errors.getFieldErrors().stream()
+//                .map(err -> new ErrorModel(err.getField(), err.getRejectedValue(), err.getDefaultMessage()))
+//                .collect(Collectors.toList());
+//    }
+
+//    @ExceptionHandler(value= ConstraintViolationException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ResponseEntity handleException(ConstraintViolationException exception) {
+//
+//        List<ErrorModel> errorMessages = exception.getConstraintViolations().stream()
+//                .map(err -> new ErrorModel(err.getPropertyPath().toString(), err.getInvalidValue(), err.getMessage()))
+//                .distinct()
+//                .collect(Collectors.toList());
+//        return new ResponseEntity(errorMessages , HttpStatus.BAD_REQUEST);
+//    }
+
+
+//        @ResponseStatus(HttpStatus.BAD_REQUEST)
+//        @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity handleInvalidInput(MethodArgumentNotValidException e) {
+//        List<ErrorModel> errors =  e.getBindingResult().getFieldErrors().stream()
+//                .map(err -> new ErrorModel(err.getField(), err.getRejectedValue(), err.getDefaultMessage()))
+//                .collect(Collectors.toList());
+//
+//        return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
+//    }
+
 }

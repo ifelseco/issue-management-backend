@@ -48,14 +48,15 @@ public class IssueApplication implements CommandLineRunner {
     }
 
     private void createAdmin(){
-        RegisterModel admin=new RegisterModel();
+        User admin=new User();
         admin.setEmail("admin@issue.com");
         admin.setFirstname("Ifelseco");
         admin.setPassword("admin");
         admin.setPhone("123456789");
         admin.setLastname("Tech");
         admin.setUsername("admin@issue.com");
-        userService.createAdmin(modelMapper.map(admin, User.class));
+        admin.setEnabled(true);
+        userService.createAdmin(admin);
         LOG.info("Admin user added successfuly.");
     }
 }

@@ -15,7 +15,7 @@ public class ValidationUtil {
 
     public List<ErrorModel> convertValidationErrors(Errors errors) {
         return errors.getFieldErrors().stream()
-                .map(err -> new ErrorModel(err.getField(), err.getDefaultMessage()))
+                .map(err -> new ErrorModel(err.getField(), err.getRejectedValue(),err.getDefaultMessage()))
                 .collect(Collectors.toList());
     }
 
