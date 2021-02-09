@@ -4,6 +4,10 @@ import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.exceptionhandling.NotUniqueException;
 import com.ifelseco.issueapp.model.RegisterModel;
 import com.ifelseco.issueapp.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +18,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/api/register")
-//@Api("/api/register")
+@Api("/api/register")
 public class RegisterController {
 
     private final UserService userService;
@@ -28,13 +32,12 @@ public class RegisterController {
 
 
     @PostMapping
-//    @ApiOperation(value = "Register Lead", notes = "Register team lead.")
-//    @ApiResponses({
-//            @ApiResponse(code = 200, message = "Success"),
-//            @ApiResponse(code = 400, message = "Bad request"),
-//            @ApiResponse(code = 500, message = "Internal Server Error")
-//    })
-
+    @ApiOperation(value = "Register Lead", notes = "Register team lead.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
     public ResponseEntity register(@Valid @RequestBody RegisterModel registerModel) throws NotUniqueException {
 
         if (userService.findByEmail(registerModel.getEmail()) != null) {
@@ -52,33 +55,4 @@ public class RegisterController {
         }
 
     }
-
-//    private List<ErrorModel> convertValidationErrors(Errors errors) {
-//        return errors.getFieldErrors().stream()
-//                .map(err -> new ErrorModel(err.getField(), err.getRejectedValue(), err.getDefaultMessage()))
-//                .collect(Collectors.toList());
-//    }
-
-//    @ExceptionHandler(value= ConstraintViolationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ResponseEntity handleException(ConstraintViolationException exception) {
-//
-//        List<ErrorModel> errorMessages = exception.getConstraintViolations().stream()
-//                .map(err -> new ErrorModel(err.getPropertyPath().toString(), err.getInvalidValue(), err.getMessage()))
-//                .distinct()
-//                .collect(Collectors.toList());
-//        return new ResponseEntity(errorMessages , HttpStatus.BAD_REQUEST);
-//    }
-
-
-//        @ResponseStatus(HttpStatus.BAD_REQUEST)
-//        @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity handleInvalidInput(MethodArgumentNotValidException e) {
-//        List<ErrorModel> errors =  e.getBindingResult().getFieldErrors().stream()
-//                .map(err -> new ErrorModel(err.getField(), err.getRejectedValue(), err.getDefaultMessage()))
-//                .collect(Collectors.toList());
-//
-//        return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
-//    }
-
 }
