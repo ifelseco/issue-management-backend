@@ -24,7 +24,6 @@ public class TeamController {
         this.teamService = teamService;
     }
 
-
     @PostMapping("/create")
     @ApiOperation(value = "Create Team", notes = "Creating a new team", response = TeamModel.class)
     @ApiResponses({
@@ -33,8 +32,7 @@ public class TeamController {
     })
     public ResponseEntity createTeam(
             @ApiParam(required = true, name = "team", value = "New team")
-            @Valid @RequestBody TeamModel teamModel,
-                                     Principal principal) {
+            @Valid @RequestBody TeamModel teamModel, Principal principal) {
         return new ResponseEntity(teamService.create(teamModel, principal), HttpStatus.CREATED);
     }
 
@@ -45,6 +43,7 @@ public class TeamController {
             @Valid @RequestBody String email, Principal principal,
             @ApiParam(required = true, name = "TeamId", value = "Team Id")
             @PathVariable Long teamId) {
+
         teamService.sendInvitationToDeveloper(email, principal, teamId);
         return new ResponseEntity("Developers are invited success", HttpStatus.OK);
     }
@@ -57,8 +56,9 @@ public class TeamController {
             @RequestParam("uuid") String uuid,
             @ApiParam(required = true, name = "TeamId", value = "TeamId")
             @RequestParam("teamId") Long teamId) {
-        User user = teamService.confirmInvitationEmail(uuid, teamId);
 
+        // TODO: 2/8/21 confirmInvatationEmail method may return null. So the return user from this method should be checked!
+        User user = teamService.confirmInvitationEmail(uuid, teamId);
         return new ResponseEntity(user.getEmail()+"Developer added to team successfully", HttpStatus.OK);
 
     }

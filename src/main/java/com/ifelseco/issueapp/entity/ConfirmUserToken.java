@@ -27,9 +27,9 @@ public class ConfirmUserToken {
 
 
 
-    public void setExpiryDate(int minutes) {
+    public void setExpiryDate(long minutes) {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, minutes);
+        now.add(Calendar.MINUTE, (int) minutes);
         this.expiryDate = now.getTime();
     }
 

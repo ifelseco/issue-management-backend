@@ -5,10 +5,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.validation.constraints.*;
 
 @Data
-@ApiModel(value = "Register User Model", description = "Model for creating lead user")
+//@ApiModel(value = "Register User Model", description = "Model for creating lead user")
 public class RegisterModel {
 
     private BaseResponseModel responseModel;

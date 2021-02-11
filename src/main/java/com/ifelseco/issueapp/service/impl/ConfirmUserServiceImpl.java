@@ -13,6 +13,7 @@ import java.util.UUID;
 @Service
 public class ConfirmUserServiceImpl implements ConfirmUserService {
 
+    private static final long  EXPIRY_DURATION = 60*24;
 
     @Autowired
     private ConfirmUserRepository confirmUserRepository;
@@ -27,7 +28,7 @@ public class ConfirmUserServiceImpl implements ConfirmUserService {
 
         ConfirmUserToken confirmUserToken=new ConfirmUserToken();
         confirmUserToken.setToken(UUID.randomUUID().toString());
-        confirmUserToken.setExpiryDate(60*24);
+        confirmUserToken.setExpiryDate(EXPIRY_DURATION);
         confirmUserToken.setUser(user);
 
         return confirmUserRepository.save(confirmUserToken);

@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/js/**",
             "/image/**",
             "/api/register",
+            "/api/register/test",
             "/login",
             "/api/user/confirm-email",
             "/swagger-resources/**",

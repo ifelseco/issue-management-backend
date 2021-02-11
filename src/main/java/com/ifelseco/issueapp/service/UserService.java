@@ -1,9 +1,7 @@
 package com.ifelseco.issueapp.service;
 
 import com.ifelseco.issueapp.entity.User;
-import com.ifelseco.issueapp.entity.UserRole;
-
-import java.util.Set;
+import com.ifelseco.issueapp.exceptionhandling.NotUniqueException;
 
 public interface UserService {
 
