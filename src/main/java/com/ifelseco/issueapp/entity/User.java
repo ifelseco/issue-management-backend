@@ -25,8 +25,7 @@ public class User implements UserDetails , Serializable {
     @Column(unique = true)
     private String username;
     private String password;
-    private String firstname;
-    private String lastname;
+    private String fullName;
     @Column(unique = true)
     private String email;
     private String phone;

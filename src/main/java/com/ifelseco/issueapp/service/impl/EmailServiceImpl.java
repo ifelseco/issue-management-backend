@@ -76,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
 
     private EmailModel initModel(User user, ConfirmUserToken confirmUserToken,Team team) {
         Map<String, Object> model = new HashMap<>();
-        model.put("firstName",user.getFirstname());
+        model.put("fullName",user.getFullName());
         model.put("signature","Issue Management");
 
         if(team != null){

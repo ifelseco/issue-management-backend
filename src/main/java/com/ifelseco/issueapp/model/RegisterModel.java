@@ -9,16 +9,13 @@ import javax.persistence.Column;
 import javax.validation.constraints.*;
 
 @Data
-//@ApiModel(value = "Register User Model", description = "Model for creating lead user")
+@ApiModel(value = "Register User Model", description = "Model for creating lead user")
 public class RegisterModel {
 
     private BaseResponseModel responseModel;
 
-    @NotBlank(message = "Firstname is required!")
-    private String firstname;
-
-    @NotBlank(message = "Lastname is required!")
-    private String lastname;
+    @NotBlank(message = "Full name is required!")
+    private String fullName;
 
     @Email(message = "Invalid email format")
     private String email;

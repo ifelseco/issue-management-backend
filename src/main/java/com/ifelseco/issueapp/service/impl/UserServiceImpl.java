@@ -58,10 +58,11 @@ public class UserServiceImpl implements UserService {
             User savedUser=userRepository.findByUsername(user.getUsername());
 
             if (savedUser!=null) {
-                LOG.info("User with username {} already exist."+user.getUsername());
+                LOG.info("User with username {} already exist." + user.getUsername());
             }else {
                 user.setPassword(SecurityUtility.passwordEncoder().encode(user.getPassword()));
                 createUserRole(user, "ROLE_LEAD");
+
                 savedUser = userRepository.save(user);
                 sendMail(savedUser);
             }
@@ -75,9 +76,9 @@ public class UserServiceImpl implements UserService {
         if(roleLead != null){
             userRoles.add(new UserRole(user,roleLead));
         }
-
         userRoles.forEach(ur -> roleRepository.save(ur.getRole()));
         user.getUserRoles().addAll(userRoles);
+
     }
 
     //todo - create a method to save developer

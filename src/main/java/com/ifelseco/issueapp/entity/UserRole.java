@@ -1,5 +1,6 @@
 package com.ifelseco.issueapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,10 +22,12 @@ public class UserRole implements Serializable {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     @EqualsAndHashCode.Exclude private User user;
 
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     @EqualsAndHashCode.Exclude private Role role;
 
 

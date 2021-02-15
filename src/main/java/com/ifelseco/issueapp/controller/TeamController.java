@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/team")
@@ -50,7 +51,7 @@ public class TeamController {
 
 
     @GetMapping("/invitation-confirm-email")
-    @ApiOperation(value = "Confirm Email", notes = "Handle Develper Confirmation From Email" )
+    @ApiOperation(value = "Confirm Email", notes = "Handle Developer Confirmation From Email" )
     public ResponseEntity confirmInvitationEmail(
             @ApiParam(required = true, name = "UUID", value = "UUID")
             @RequestParam("uuid") String uuid,
@@ -58,10 +59,34 @@ public class TeamController {
             @RequestParam("teamId") Long teamId) {
 
         // TODO: 2/8/21 confirmInvatationEmail method may return null. So the return user from this method should be checked!
+
         User user = teamService.confirmInvitationEmail(uuid, teamId);
-        return new ResponseEntity(user.getEmail()+"Developer added to team successfully", HttpStatus.OK);
+        if(user!=null){
+            return new ResponseEntity(user.getEmail()+" Developer added to team successfully", HttpStatus.OK);
+        }else{
+            return new ResponseEntity("Db Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 
+    @DeleteMapping("delete/{teamId}")
+    public void deleteTeam(@PathVariable Long teamId) {
+        teamService.deleteTeam(teamId);
+    }
+
+    @GetMapping("{teamId}")
+    public ResponseEntity<TeamModel> getTeamById(@PathVariable("teamId") Long teamId) {
+        return new ResponseEntity(teamService.findTeamById(teamId), HttpStatus.OK);
+    }
+
+    @GetMapping()
+    public ResponseEntity<Set<TeamModel>> getAllTeams() {
+        return new ResponseEntity(teamService.findAllTeams(), HttpStatus.OK);
+    }
+
+    @PutMapping("edit/{teamId}")
+    public ResponseEntity<TeamModel> editTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamModel teamModel){
+        return new ResponseEntity(teamService.editTeam(teamId, teamModel), HttpStatus.OK);
+    }
 
 }

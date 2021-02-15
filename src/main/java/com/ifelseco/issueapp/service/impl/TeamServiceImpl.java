@@ -1,6 +1,7 @@
 package com.ifelseco.issueapp.service.impl;
 
 import com.ifelseco.issueapp.entity.*;
+import com.ifelseco.issueapp.model.MemberModel;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
@@ -8,9 +9,7 @@ import com.ifelseco.issueapp.service.*;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.security.Principal;
 import java.util.*;
@@ -49,17 +48,48 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamModel create(TeamModel teamModel, Principal principal) {
+
         User user = userRepository.findByUsername(principal.getName());
         Tenant tenant=user.getTenant();
         Team team = modelMapper.map(teamModel,Team.class);
-        Set<User> userSet= team.getMembers();
+
+        setTeamsFieldsBeforeSave(user, tenant, team);
+
+        TeamModel newTeamModel = getTeamModel(user, team);
+
+
+
+        return newTeamModel;
+    }
+
+    private TeamModel getTeamModel(User user, Team team) {
+        Team savedTeam = teamRepository.save(team);
+
+        TeamModel newTeamModel = new TeamModel();
+        MemberModel lead = modelMapper.map(user, MemberModel.class);
+        List<MemberModel> memberModelList = new ArrayList<>();
+        memberModelList.add(lead);
+
+        newTeamModel.setCreateTime(savedTeam.getCreateTime());
+        newTeamModel.setCreatedBy(lead);
+        newTeamModel.setId(savedTeam.getId());
+        newTeamModel.setMembers(memberModelList);
+        newTeamModel.setName(savedTeam.getName());
+
+        //TODO : Project eklenince ProjectModel e cevirip set edilecek
+        // newTeamModel.setProjects(savedTeam.getProjects());
+
+        return newTeamModel;
+    }
+
+    private void setTeamsFieldsBeforeSave(User user, Tenant tenant, Team team) {
+        Set<User> userSet= new HashSet<>();
         userSet.add(user);
         team.setMembers(userSet);
         team.setCreatedBy(user.getId());
         team.setCreateTime(new Date());
         team.setTenant(tenant);
-        TeamModel teamModel1 = modelMapper.map(teamRepository.save(team),TeamModel.class);
-        return teamModel1;
+
     }
 
     @Override
@@ -84,15 +114,7 @@ public class TeamServiceImpl implements TeamService {
 
     }
 
-    @Override
-    public TeamModel update(TeamModel teamModel) {
-        return null;
-    }
 
-    @Override
-    public void delete(long Id) {
-
-    }
 
     public User confirmInvitationEmail(String uuid,Long teamId) {
 
@@ -116,6 +138,8 @@ public class TeamServiceImpl implements TeamService {
         return null;
     }
 
+
+
     private boolean checkDev(User user) {
         boolean isDev = false;
         Set<UserRole> userRoles = user.getUserRoles();
@@ -132,6 +156,62 @@ public class TeamServiceImpl implements TeamService {
                 orElseThrow(NoSuchElementException::new);
         team.getMembers().add(user);
         teamRepository.save(team);
+    }
+
+    @Override
+    public void deleteTeam(Long teamId) {
+
+        teamRepository.deleteById(teamId);
+    }
+
+    @Override
+    public TeamModel findTeamById(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(NoSuchElementException::new);
+
+        User user = userRepository.findById(team.getCreatedBy())
+                .orElseThrow(NoSuchElementException::new);
+
+        return getTeamModel(user, team);
+
+    }
+
+    @Override
+    public Set<TeamModel> findAllTeams() {
+       List<Team> teamSet = teamRepository.findAll();
+        return convertTeamSetToTeamModelSet(teamSet);
+
+
+    }
+
+    @Override
+    public TeamModel editTeam(Long teamId, TeamModel teamModel) {
+        Team updatedTeam = teamRepository.findById(teamId)
+                .orElseThrow(NoSuchElementException::new);
+
+        modelMapper.getConfiguration().setSkipNullEnabled(true); //configure ModelMapper to ignore all properties that are null
+        modelMapper.map(teamModel, updatedTeam);
+
+        User user = userRepository.findById(updatedTeam.getCreatedBy())
+                .orElseThrow(NoSuchElementException::new);
+
+        return getTeamModel(user, updatedTeam);
+
+    }
+
+
+    private Set<TeamModel> convertTeamSetToTeamModelSet(List<Team> teamSet){
+        Set<TeamModel> teamModelSet = new HashSet<>();
+        TeamModel teamModel;
+
+        for(Team team : teamRepository.findAll()){
+            User user = userRepository.findById(team.getCreatedBy())
+                    .orElseThrow(NoSuchElementException::new);
+
+            teamModel= getTeamModel(user, team);
+            teamModelSet.add( teamModel );
+        }
+        return teamModelSet;
     }
 
 }
