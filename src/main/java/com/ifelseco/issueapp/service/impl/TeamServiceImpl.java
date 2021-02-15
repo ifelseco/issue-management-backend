@@ -73,7 +73,10 @@ public class TeamServiceImpl implements TeamService {
 
         newTeamModel.setCreateTime(savedTeam.getCreateTime());
         newTeamModel.setCreatedBy(lead);
-        newTeamModel.setTenantShowModel(new TenantShowModel(savedTeam.getTenant().getTenantName(),savedTeam.getTenant().getTenantCode()));
+
+        //newTeamModel.setTenantShowModel(new TenantShowModel(savedTeam.getTenant().getTenantName(),savedTeam.getTenant().getTenantCode()));
+
+        newTeamModel.setTenantShowModel(modelMapper.map(savedTeam.getTenant(),TenantShowModel.class));
         newTeamModel.setId(savedTeam.getId());
         newTeamModel.setMembers(memberModelList);
         newTeamModel.setName(savedTeam.getName());
