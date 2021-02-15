@@ -3,6 +3,7 @@ package com.ifelseco.issueapp.service.impl;
 import com.ifelseco.issueapp.entity.*;
 import com.ifelseco.issueapp.model.MemberModel;
 import com.ifelseco.issueapp.model.TeamModel;
+import com.ifelseco.issueapp.model.TenantShowModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
 import com.ifelseco.issueapp.service.*;
@@ -72,6 +73,7 @@ public class TeamServiceImpl implements TeamService {
 
         newTeamModel.setCreateTime(savedTeam.getCreateTime());
         newTeamModel.setCreatedBy(lead);
+        newTeamModel.setTenantShowModel(new TenantShowModel(savedTeam.getTenant().getTenantName(),savedTeam.getTenant().getTenantCode()));
         newTeamModel.setId(savedTeam.getId());
         newTeamModel.setMembers(memberModelList);
         newTeamModel.setName(savedTeam.getName());

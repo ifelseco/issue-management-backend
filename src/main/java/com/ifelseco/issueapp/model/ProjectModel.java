@@ -14,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ProjectModel {
 
-
     private String name;
     private List<MemberModel> members;
     private Tenant tenant;

@@ -18,4 +18,5 @@ public class TeamModel {
     private String name;
     private Date createTime;
     private MemberModel createdBy;
+    private TenantShowModel tenantShowModel;
 }
