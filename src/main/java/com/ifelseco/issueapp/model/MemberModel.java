@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.Path;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ErrorModel {
-    private String field;
-    private Object rejectedValue;
-    private String message;
+public class MemberModel {
+    private String username;
+    private String fullName;
+
 }

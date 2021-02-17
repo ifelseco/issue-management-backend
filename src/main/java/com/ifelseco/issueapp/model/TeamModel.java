@@ -5,6 +5,7 @@ import com.ifelseco.issueapp.entity.User;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 
@@ -12,9 +13,10 @@ import java.util.Set;
 @ApiModel(value = "Team Model", description = "Model for creating new team")
 public class TeamModel {
     private Long id;
-    private Set<User> members;
-    private Set<Project> projects;
+    private List<MemberModel> members;
+    private List<ProjectModel> projects;
     private String name;
     private Date createTime;
-    private Long createdBy;
+    private MemberModel createdBy;
+    private TenantShowModel tenantShowModel;
 }

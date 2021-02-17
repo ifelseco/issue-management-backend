@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,18 +16,17 @@ import java.util.Set;
 @Data
 public class User implements UserDetails , Serializable {
 
-
     private static final long serialVersionUID=1L;
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @Column(unique = true)
     private String username;
     private String password;
-    private String firstname;
-    private String lastname;
+    private String fullName;
+    @Column(unique = true)
     private String email;
     private String phone;
     private boolean deletedUser;

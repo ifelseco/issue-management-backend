@@ -1,5 +1,6 @@
 package com.ifelseco.issueapp.service.impl;
 
+import com.ifelseco.issueapp.exceptionhandling.NotUniqueException;
 import com.ifelseco.issueapp.security.SecurityUtility;
 import com.ifelseco.issueapp.entity.Role;
 import com.ifelseco.issueapp.entity.User;
@@ -48,23 +49,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByEmail(String email) {
-
         return userRepository.findByEmail(email);
     }
 
     @Transactional
     public User createLead(User user) {
 
-        User savedUser=userRepository.findByUsername(user.getUsername());
+            User savedUser=userRepository.findByUsername(user.getUsername());
 
-        if (savedUser!=null) {
-            LOG.info("User with username {} already exist."+user.getUsername());
-        }else{
-            user.setPassword(SecurityUtility.passwordEncoder().encode(user.getPassword()));
-            createUserRole(user, "ROLE_LEAD");
-            savedUser=userRepository.save(user);
-            sendMail(savedUser);
-        }
+            if (savedUser!=null) {
+                LOG.info("User with username {} already exist." + user.getUsername());
+            }else {
+                user.setPassword(SecurityUtility.passwordEncoder().encode(user.getPassword()));
+                createUserRole(user, "ROLE_LEAD");
+
+                savedUser = userRepository.save(user);
+                sendMail(savedUser);
+            }
         return savedUser;
     }
 
@@ -75,9 +76,9 @@ public class UserServiceImpl implements UserService {
         if(roleLead != null){
             userRoles.add(new UserRole(user,roleLead));
         }
-
         userRoles.forEach(ur -> roleRepository.save(ur.getRole()));
         user.getUserRoles().addAll(userRoles);
+
     }
 
     //todo - create a method to save developer

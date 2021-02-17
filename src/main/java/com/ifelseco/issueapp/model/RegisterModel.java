@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.validation.constraints.*;
 
 @Data
@@ -13,11 +14,8 @@ public class RegisterModel {
 
     private BaseResponseModel responseModel;
 
-    @NotBlank(message = "Firstname is required!")
-    private String firstname;
-
-    @NotBlank(message = "Lastname is required!")
-    private String lastname;
+    @NotBlank(message = "Full name is required!")
+    private String fullName;
 
     @Email(message = "Invalid email format")
     private String email;
