@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface TeamRepository extends CrudRepository<Team,Long> {
     List<Team> findAll();
+    Team findByCreatedBy(Long id);
 }

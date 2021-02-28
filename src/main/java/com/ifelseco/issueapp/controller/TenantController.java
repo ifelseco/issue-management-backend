@@ -10,6 +10,7 @@ import com.ifelseco.issueapp.service.RoleService;
 import com.ifelseco.issueapp.service.TenantService;
 import com.ifelseco.issueapp.service.UserService;
 import com.ifelseco.issueapp.util.ValidationUtil;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tenant")
 @Secured("ROLE_ADMIN")
+@AllArgsConstructor
 public class TenantController {
 
     private static final Logger LOG = LoggerFactory.getLogger(TenantController.class);
@@ -39,17 +41,6 @@ public class TenantController {
     private RoleService roleService;
     private ModelMapper modelMapper;
     private ValidationUtil validationUtil;
-
-    public TenantController(UserService userService,
-                            TenantService tenantService,
-                            RoleService roleService,
-                            ModelMapper modelMapper, ValidationUtil validationUtil) {
-        this.userService = userService;
-        this.tenantService = tenantService;
-        this.roleService = roleService;
-        this.modelMapper = modelMapper;
-        this.validationUtil = validationUtil;
-    }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ResponseEntity createTenant(@Valid @RequestBody TenantModel tenantModel,

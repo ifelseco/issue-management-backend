@@ -16,8 +16,6 @@ public class Tenant implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
-
-
     private String tenantName;
     private String phone;
     private String email;

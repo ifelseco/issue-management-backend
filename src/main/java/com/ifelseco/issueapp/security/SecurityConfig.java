@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/css/**",
             "/js/**",
             "/image/**",
-            "/api/register",
+            "/api/register/*",
             "/api/register/test",
             "/login",
             "/api/user/confirm-email",

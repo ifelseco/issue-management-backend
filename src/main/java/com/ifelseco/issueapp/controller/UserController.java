@@ -7,6 +7,7 @@ import com.ifelseco.issueapp.model.BaseResponseModel;
 import com.ifelseco.issueapp.service.ConfirmUserService;
 import com.ifelseco.issueapp.service.UserService;
 import io.swagger.annotations.*;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api/user")
+@AllArgsConstructor
 public class UserController {
 
     private ConfirmUserService confirmUserService;
     private UserService userService;
 
-    @Autowired
-    public UserController(ConfirmUserService confirmUserService,UserService userService) {
-        this.confirmUserService = confirmUserService;
-        this.userService=userService;
-    }
 
     @GetMapping("/confirm-email")
     public ResponseEntity<BaseResponseModel> confirmUserEmail(@RequestParam("uuid") String uuid) {

@@ -7,6 +7,8 @@ import com.ifelseco.issueapp.model.TenantShowModel;
 import com.ifelseco.issueapp.repository.TeamRepository;
 import com.ifelseco.issueapp.repository.UserRepository;
 import com.ifelseco.issueapp.service.*;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,35 +19,16 @@ import java.util.*;
 
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class TeamServiceImpl implements TeamService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TeamServiceImpl.class);
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final ConfirmUserService confirmUserService;
     private final EmailService emailService;
-    private final UserServiceImpl userServiceImpl;
     private final RoleService roleService;
-    private final TenantService tenantService;
-
-
-
-    public TeamServiceImpl(TeamRepository teamRepository,
-                           UserRepository userRepository,
-                           ModelMapper modelMapper,
-                           ConfirmUserService confirmUserService,
-                           EmailService emailService, UserServiceImpl userServiceImpl, RoleService roleService, TenantService tenantService) {
-        this.teamRepository = teamRepository;
-        this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
-        this.emailService = emailService;
-        this.confirmUserService = confirmUserService;
-        this.userServiceImpl = userServiceImpl;
-        this.roleService = roleService;
-        this.tenantService = tenantService;
-    }
-
 
     @Override
     public TeamModel create(TeamModel teamModel, Principal principal) {
@@ -57,8 +40,6 @@ public class TeamServiceImpl implements TeamService {
         setTeamsFieldsBeforeSave(user, tenant, team);
 
         TeamModel newTeamModel = getTeamModel(user, team);
-
-
 
         return newTeamModel;
     }
@@ -94,7 +75,6 @@ public class TeamServiceImpl implements TeamService {
         team.setCreatedBy(user.getId());
         team.setCreateTime(new Date());
         team.setTenant(tenant);
-
     }
 
     @Override
@@ -111,10 +91,10 @@ public class TeamServiceImpl implements TeamService {
                     }
                     emailService.sendConfirmationToDeveloper(user,team);
             }else {
-                LOG.error("Team id is not valid");
+                log.error("Team id is not valid");
             }
         }catch(Exception e){
-            LOG.error("Team or user is not valid",e.getMessage());
+            log.error("Team or user is not valid",e.getMessage());
         }
 
     }
@@ -138,7 +118,7 @@ public class TeamServiceImpl implements TeamService {
                 return user;
             }
         } catch (Exception e) {
-            LOG.error("Token,team or user is not found", e.getMessage());
+            log.error("Token,team or user is not found", e.getMessage());
         }
         return null;
     }
@@ -185,8 +165,6 @@ public class TeamServiceImpl implements TeamService {
     public Set<TeamModel> findAllTeams() {
        List<Team> teamSet = teamRepository.findAll();
         return convertTeamSetToTeamModelSet(teamSet);
-
-
     }
 
     @Override
@@ -209,7 +187,7 @@ public class TeamServiceImpl implements TeamService {
         Set<TeamModel> teamModelSet = new HashSet<>();
         TeamModel teamModel;
 
-        for(Team team : teamRepository.findAll()){
+        for(Team team : teamSet){
             User user = userRepository.findById(team.getCreatedBy())
                     .orElseThrow(NoSuchElementException::new);
 
