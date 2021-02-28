@@ -89,11 +89,11 @@ public class GlobalExceptionHandler{
 //    }
 //
 //    //    //Http Status : 409 (conflict) ++
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public String handleEntityIsExist(DataIntegrityViolationException e) {
-//        return "This is already exist.";
-//    }
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public String handleEntityIsExist(DataIntegrityViolationException e) {
+        return "There is an error and your request is not completed!";
+    }
 //
 //
 //    @ResponseStatus(HttpStatus.NOT_FOUND)

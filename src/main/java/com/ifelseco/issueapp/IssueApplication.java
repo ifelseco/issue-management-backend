@@ -50,10 +50,9 @@ public class IssueApplication implements CommandLineRunner {
     private void createAdmin(){
         User admin=new User();
         admin.setEmail("admin@issue.com");
-        admin.setFirstname("Ifelseco");
+        admin.setFullName("Ifelseco Tech");
         admin.setPassword("admin");
         admin.setPhone("123456789");
-        admin.setLastname("Tech");
         admin.setUsername("admin@issue.com");
         admin.setEnabled(true);
         userService.createAdmin(admin);

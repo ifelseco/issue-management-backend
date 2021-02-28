@@ -25,64 +25,57 @@ public class UserController {
         this.userService=userService;
     }
 
-
-
     @GetMapping("/confirm-email")
-    public ResponseEntity<BaseResponseModel> confirmUserEmail(
-            @RequestParam("uuid") String uuid) {
-
+    public ResponseEntity<BaseResponseModel> confirmUserEmail(@RequestParam("uuid") String uuid) {
 
         BaseResponseModel responseModel=new BaseResponseModel();
 
         try {
             ConfirmUserToken confirmUserToken=confirmUserService.findByToken(uuid);
-
-            if(confirmUserToken==null) {
-                // set response message
-
-                responseModel.setResponseCode(400);
-                responseModel.setResponseMessage("Geçersiz token...");
-                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
-            }else if(confirmUserToken.isExpired()){
-                // set response message
-                responseModel.setResponseCode(400);
-                responseModel.setResponseMessage("Onay maili zaman aşınmına uğradı.");
-                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
-            }else {
-
-                try {
-                    User user=userService.findByEmail(confirmUserToken.getUser().getEmail());
-
-                    if(user==null) {
-                        responseModel.setResponseCode(400);
-                        responseModel.setResponseMessage("Geçersiz token...");
-                        return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
-                    }else {
-                        user.setEnabled(true);
-                        userService.createLead(user);
-                        responseModel.setResponseCode(200);
-                        responseModel.setResponseMessage("Kullanıcı onaylandı. Artık giriş yapabilirsiniz.");
-                        return new ResponseEntity<>(responseModel, HttpStatus.OK);
-                    }
-                }catch(Exception e) {
-                    responseModel.setResponseCode(500);
-                    responseModel.setResponseMessage("Sistem hatası...");
-                    return new ResponseEntity<>(responseModel, HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-
-
-            }
-
+            return checkByConfirmUserToken(responseModel, confirmUserToken);
         }catch (Exception e) {
             responseModel.setResponseCode(500);
-            responseModel.setResponseMessage("Sistem hatası...");
+            responseModel.setResponseMessage("System Error...");
             return new ResponseEntity<>(responseModel, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+
     }
 
+    private ResponseEntity<BaseResponseModel> checkByConfirmUserToken(BaseResponseModel responseModel, ConfirmUserToken confirmUserToken) {
+        if(confirmUserToken==null) {
+            responseModel.setResponseCode(400);
+            responseModel.setResponseMessage("Thanks for confirming your email, but your confirmation code is invalid");
+            return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+        }else if(confirmUserToken.isExpired()){
+            responseModel.setResponseCode(400);
+            responseModel.setResponseMessage("Thanks for confirming your email, but your confirmation code has expired");
+            return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+        }else {
+            try {
+                User user=userService.findByEmail(confirmUserToken.getUser().getEmail());
+                return checkUserByConfirmationToken(responseModel, user);
+            }catch(Exception e) {
+                responseModel.setResponseCode(500);
+                responseModel.setResponseMessage("System Error...");
+                return new ResponseEntity<>(responseModel, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 
-
+    private ResponseEntity<BaseResponseModel> checkUserByConfirmationToken(BaseResponseModel responseModel, User user) {
+        if(user==null) {
+            responseModel.setResponseCode(400);
+            responseModel.setResponseMessage("Thanks for confirming your email, but your confirmation code is invalid");
+            return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+        }else {
+            user.setEnabled(true);
+            userService.createLead(user);
+            responseModel.setResponseCode(200);
+            responseModel.setResponseMessage("Your confirmation is successful. You can now login.");
+            return new ResponseEntity<>(responseModel, HttpStatus.OK);
+        }
+    }
 
 
 }

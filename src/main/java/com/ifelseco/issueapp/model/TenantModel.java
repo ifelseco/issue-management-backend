@@ -13,13 +13,13 @@ public class TenantModel {
 
     private Long id;
 
-    @NotBlank(message = "Tenantname is required!")
+    @NotBlank(message = "Tenant name is required!")
     private String tenantName;
 
     @NotBlank(message = "Phone is required!")
     private String phone;
 
-    @NotBlank(message = "Adress is required!")
+    @NotBlank(message = "Address is required!")
     private String address;
 
 
