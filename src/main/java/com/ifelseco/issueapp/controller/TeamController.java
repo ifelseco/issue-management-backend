@@ -5,6 +5,7 @@ import com.ifelseco.issueapp.entity.User;
 import com.ifelseco.issueapp.model.TeamModel;
 import com.ifelseco.issueapp.service.TeamService;
 import io.swagger.annotations.*;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -17,13 +18,10 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/team")
 @Api("/api/team")
+@AllArgsConstructor
 public class TeamController {
 
     private final TeamService teamService;
-
-    public TeamController(TeamService teamService) {
-        this.teamService = teamService;
-    }
 
     @PostMapping("/create")
     @ApiOperation(value = "Create Team", notes = "Creating a new team", response = TeamModel.class)

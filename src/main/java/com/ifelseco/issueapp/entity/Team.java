@@ -46,7 +46,4 @@ public class Team implements Serializable {
     //it is id of leader
     private Long createdBy;
 
-
-
-
 }
