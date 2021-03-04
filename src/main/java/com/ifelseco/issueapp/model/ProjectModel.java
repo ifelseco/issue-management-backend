@@ -15,7 +15,7 @@ import java.util.List;
 public class ProjectModel {
 
     private String name;
+    private String description;
     private List<MemberModel> members;
-    private Tenant tenant;
 
 }

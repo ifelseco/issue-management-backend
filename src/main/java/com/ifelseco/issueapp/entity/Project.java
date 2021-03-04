@@ -1,6 +1,5 @@
 package com.ifelseco.issueapp.entity;
 
-import com.ifelseco.issueapp.model.TeamModel;
 import lombok.Data;
 import javax.persistence.*;
 import java.util.Set;
