@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 public class MemberModel {
     private String username;
     private String fullName;
-
 }
