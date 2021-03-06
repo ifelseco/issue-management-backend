@@ -30,7 +30,7 @@ public class ProjectController {
         return new ResponseEntity(projectService.create(selectedMemberIds, projectModel, principal), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("delete/{projectId}")
+    @DeleteMapping("/delete/{projectId}")
     public void deleteTeam(@PathVariable Long projectId) {
         projectService.deleteProject(projectId);
     }

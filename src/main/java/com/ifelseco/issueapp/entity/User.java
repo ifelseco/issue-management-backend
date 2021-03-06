@@ -25,8 +25,7 @@ public class User implements UserDetails , Serializable {
 
     private String username;
     private String password;
-    private String firstname;
-    private String lastname;
+    private String fullName;
     private String email;
     private String phone;
     private boolean deletedUser;
